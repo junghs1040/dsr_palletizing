@@ -6,13 +6,15 @@
   <description>TODO: Package description</description>
   <maintainer email="junghs1040@naver.com">seok2</maintainer>
   <license>TODO: License declaration</license>
-
+  <build_depend>gazebo_ros</build_depend>
   <depend>rclpy</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
 
   <export>
     <build_type>ament_python</build_type>

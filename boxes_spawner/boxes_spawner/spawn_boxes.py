@@ -5,11 +5,12 @@ import time
 from ament_index_python.packages import get_package_share_directory
 from gazebo_msgs.srv import SpawnEntity
 
-def boxes_choice(urdf_file_path, box_num):
+def boxes_choice(urdf_file_path, box_num, width, length, height):
     # Set data for request
+    
     request = SpawnEntity.Request()
     request.name = str(box_num)
-    request.xml = open(urdf_file_path, 'r').read()
+    request.xml = "<?xml version=\"1.0\" ?><robot name=\"box1\"><link name=\"box1\"><visual><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><geometry><box size=\""+str(width)+" "+str(length)+" "+str(height)+"\"/></geometry></visual><inertial><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><mass value=\"1\"/><inertia ixx=\"100\" ixy=\"0.0\" ixz=\"0.0\" iyy=\"100\" iyz=\"0.0\" izz=\"100\"/></inertial><collision><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><geometry><box size=\""+str(width)+" "+str(length)+" "+str(height)+"\"/></geometry></collision></link></robot>"
     #request.robot_namespace = argv[1]
     request.initial_pose.position.x = float(0.0)
     request.initial_pose.position.y = float(0.0)
@@ -33,7 +34,9 @@ def main():
     node.get_logger().info(
         'Creating Service client to connect to `/spawn_entity`')
     client = node.create_client(SpawnEntity, "/spawn_entity")
-
+    width = 0.2
+    length = 0.1
+    height = 0.2
     node.get_logger().info("Connecting to `/spawn_entity` service...")
     if not client.service_is_ready():
         client.wait_for_service()
@@ -44,7 +47,7 @@ def main():
         get_package_share_directory(package_name), "urdf", robot_file)
         
     for i in range(box_num):
-        req = boxes_choice(urdf_file_path, i)
+        req = boxes_choice(urdf_file_path, i, width, length, height)
         node.get_logger().info("Sending service request to `/spawn_entity`")
         future = client.call_async(req)
         time.sleep(1)

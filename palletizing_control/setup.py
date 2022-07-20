@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-        'palletizing_control       = dsr_palletizing.palletizing_control:main',
+        'palletizing_control       = palletizing_control.palletizing_control:main',
         ],
     },
 )

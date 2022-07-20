@@ -14,14 +14,20 @@ def yaml_read(configParams,n):
 
 def boxes_choice(urdf_file_path, box_num, width, length, height):
     # Set data for request
-    
+    mass = 0.005
+    #ixx = mass*(length*length+height*height)/12
+    #iyy = mass*(width*width+height*height)/12
+    #izz = mass*(length*length+width*width)/12
+    ixx = 0.001
+    iyy = 0.001
+    izz = 0.001
     request = SpawnEntity.Request()
     request.name = str(box_num)
-    request.xml = "<?xml version=\"1.0\" ?><robot name=\"box1\"><link name=\"box1\"><visual><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><geometry><box size=\""+str(width)+" "+str(length)+" "+str(height)+"\"/></geometry></visual><inertial><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><mass value=\"1\"/><inertia ixx=\"100\" ixy=\"0.0\" ixz=\"0.0\" iyy=\"100\" iyz=\"0.0\" izz=\"100\"/></inertial><collision><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><geometry><box size=\""+str(width)+" "+str(length)+" "+str(height)+"\"/></geometry></collision></link></robot>"
+    request.xml = "<?xml version=\"1.0\" ?><robot name=\"box1\"><link name=\"box1\"><visual><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><geometry><box size=\""+str(width)+" "+str(length)+" "+str(height)+"\"/></geometry></visual><inertial><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><mass value=\""+str(mass)+"\"/><inertia ixx=\""+str(ixx)+"\" ixy=\"0.0\" ixz=\"0.0\" iyy=\""+str(iyy)+"\" iyz=\"0.0\" izz=\""+str(izz)+"\"/></inertial><collision><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><geometry><box size=\""+str(width)+" "+str(length)+" "+str(height)+"\"/></geometry></collision></link><gazebo reference=\"box1\"><material>Gazebo/Red</material></gazebo></robot>"
     #request.robot_namespace = argv[1]
-    request.initial_pose.position.x = float(0.0)
-    request.initial_pose.position.y = float(0.0)
-    request.initial_pose.position.z = float(1.0)    
+    request.initial_pose.position.x = float(0.4)
+    request.initial_pose.position.y = float(0.5)
+    request.initial_pose.position.z = float(0.0)    
     
     return request
 
@@ -33,7 +39,7 @@ def main():
     # Start node
     rclpy.init()
     node = rclpy.create_node("spawn_boxes") 
-    box_num = 5
+    box_num = 1
     package_name = "boxes_spawner"
     robot_file = "box1.urdf"
     yaml_file = "boxes_set.yaml"

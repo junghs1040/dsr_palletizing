@@ -6,6 +6,23 @@ import yaml
 from ament_index_python.packages import get_package_share_directory
 from gazebo_msgs.srv import SpawnEntity
 
+class SpawnBoxServer(Node):
+    def __init__(self):
+        super().__init__('spawnbox service server')
+        
+        self.spawnbox_service_server = self.create_service(
+            SpawnBox, 'spawnbox_operator', self.spawn_box,
+            callback_group = self.callback_group)
+    def spawn_box(self, request, response):
+        self.req = request.spawn
+        if req == True:
+            return spawn_box
+        
+        return response
+        
+        
+
+
 def yaml_read(configParams,n):
     width = configParams['box_set1']['box'+str(n)][0]
     length = configParams['box_set1']['box'+str(n)][1]

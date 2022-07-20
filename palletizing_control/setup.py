@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
         'palletizing_control       = palletizing_control.palletizing_control:main',
+        'spawnbox_service_client = palletizing_control.palletizing_control:main'
         ],
     },
 )

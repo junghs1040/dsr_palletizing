@@ -9,7 +9,7 @@
 
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
-  
+  <depend>dsr_control2</depend>
   <!--build_depend>roslaunch</build_depend-->
   <build_depend>gazebo_ros</build_depend>
   

@@ -25,8 +25,8 @@ class SpawnBoxServer(Node):
         response.length = length
         response.height = height
         print(self.count)
-        req = self.boxes_choice(self.count+1,width,length,height)
         
+        req = self.boxes_choice(self.count+1,width,length,height)        
         future = self.client.call_async(req)
         self.count +=1
         return response
@@ -54,8 +54,7 @@ class SpawnBoxServer(Node):
         #request.robot_namespace = argv[1]
         request.initial_pose.position.x = float(0.4)
         request.initial_pose.position.y = float(0.5)
-        request.initial_pose.position.z = float(0.0)    
-    
+        request.initial_pose.position.z = float(0.0)        
         return request
 
     def boxes_data_read(self, count):

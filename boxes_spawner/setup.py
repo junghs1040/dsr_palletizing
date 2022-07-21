@@ -27,7 +27,7 @@ setup(
     entry_points={
         'console_scripts': [
             'spawn_boxes = boxes_spawner.spawn_boxes:main',
-            'spawn_boxes1 = boxes_spawner.spawn_boxes1:main',
+          
         ],
     },
 )

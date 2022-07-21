@@ -8,6 +8,7 @@ import os, sys
 import threading, time
 import signal
 from rclpy.node import Node
+from std_srvs.srv import *
 from dsr_msgs2.msg import *
 from dsr_msgs2.srv import *
 
@@ -37,6 +38,28 @@ class SpawnBoxOperator(Node):
         futures = self.spawnbox_service_client.call_async(request)
         print("spawn the box!!!")
         return futures
+        
+class GripperOperator(Node):
+    def __init__(self):
+        super().__init__('vacuum_gripper_controller')
+ 
+        self.gripper_on_client = self.create_client(
+            SetBool, '/vacuum_gripper1/switch')        
+        self.gripper_off_client = self.create_client(
+            SetBool, '/vacuum_gripper1/switch')             
+            
+    def send_gripper_on(self):
+        request = SetBool.Request()
+        request.data = True
+        futures = self.gripper_on_client.call_async(request)
+        return futures
+        
+    def send_gripper_off(self):
+        request = SetBool.Request()
+        request.data = False
+        futures = self.gripper_off_client.call_async(request)     
+        return futures       
+        
 
 def signal_handler(sig, frame):
     print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX signal_handler')
@@ -59,6 +82,9 @@ def main(args=None):
 
     spawnbox = SpawnBoxOperator()
     future = spawnbox.send_request()
+    
+    gripper = GripperOperator()
+    future2 = gripper.send_gripper_on()
     #----------------------------------------------------------------
     robot = CDsrRobot()
     #----------------------------------------------------------------
@@ -88,7 +114,7 @@ def main(args=None):
         # move joint task : picking position  
         robot.movel(pick_pos_up, velx, accx)
         print("------------> movel OK")    
-
+        
         # move line : move to pick    
         robot.movel(pick_pos, velx, accx)
         print("------------> movel OK")    
@@ -99,7 +125,7 @@ def main(args=None):
         robot.movel(pick_pos_up, velx, accx)
         print("------------> movel OK")    
         time.sleep(1)        
-
+        gripper.send_gripper_off()
         # move joint task : placing position  
         robot.movel(place_pos_up, velx, accx)
         print("------------> movel OK")    

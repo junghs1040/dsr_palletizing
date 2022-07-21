@@ -4,42 +4,40 @@ import rclpy
 import time
 import yaml
 from rclpy.node import Node
-from dsr_msgs2.msg import *
-from dsr_msgs2.srv import *
 from ament_index_python.packages import get_package_share_directory
 from gazebo_msgs.srv import SpawnEntity
+from dsr_msgs2.msg import *
+from dsr_msgs2.srv import *
 
 class SpawnBoxServer(Node):
     def __init__(self):
-        super().__init__('spawn_boxes')
+        super().__init__('spawnbox_service_server')
         
         self.spawnbox_service_server = self.create_service(
             SpawnBox, 'spawnbox_operator', self.spawn_box)
-        self.client = self.create_client(SpawnEntity, "/spawn_entity")        
-    count = 0     
+            
     def spawn_box(self, request, response):
-        req = request.spawn
-        
-        width, length, height = self.boxes_data_read(self.count)
-        response.width = width
-        response.length = length
-        response.height = height
-        print(self.count)
-        req = self.boxes_choice(self.count+1,width,length,height)
-        
-        future = self.client.call_async(req)
-        self.count +=1
-        return response
+        self.req = request.spawn
+        width, length, height = boxes_data_read()
+        #response.width = width
+        #response.length = length
+        #response.height = height
+        print("hello")
+        spawn_box = 1
+        no_spawn_box = 0
+        if req == True:
+            return spawn_box
+        else:
+            return no_spawn_box
 
-    
 
-    def yaml_read(self, configParams,n):
+    def yaml_read(configParams,n):
         width = configParams['box_set1']['box'+str(n)][0]
         length = configParams['box_set1']['box'+str(n)][1]
         height = configParams['box_set1']['box'+str(n)][2]
         return width, length, height
 
-    def boxes_choice(self, box_num, width, length, height):
+    def boxes_choice(box_num, width, length, height):
         # Set data for request
         mass = 0.005
         #ixx = mass*(length*length+height*height)/12
@@ -58,30 +56,49 @@ class SpawnBoxServer(Node):
     
         return request
 
-    def boxes_data_read(self, count):
-        i = count
+    def boxes_data_read():
         package_name = "boxes_spawner"
         robot_file = "box1.urdf"
         yaml_file = "boxes_set.yaml"
         world_file_name = "empty.world"
         
+        node.get_logger().info(
+            'Creating Service client to connect to `/spawn_entity`')
+        client = node.create_client(SpawnEntity, "/spawn_entity")
+        node.get_logger().info("Connecting to `/spawn_entity` service...")
+        if not client.service_is_ready():
+            client.wait_for_service()
+            node.get_logger().info("...connected!")
     
         # Get the yaml configuration
         yaml_file_path = os.path.join(
         get_package_share_directory(package_name), "config", yaml_file)
         yaml_config = open(yaml_file_path, 'r').read()
         configParams = yaml.safe_load(yaml_config)   
-        width, length, height = self.yaml_read(configParams,i+1)
-        
-        return width, length, height
 
 def main():
 
     argv = sys.argv[1:]
     rclpy.init()
-    # node = rclpy.create_node("spawn_boxes") 
+    node = rclpy.create_node("spawn_boxes") 
     
     spawn_box = SpawnBoxServer()
+    
+    node.get_logger().info(
+        'Creating Service client to connect to `/spawn_entity`')
+    client = node.create_client(SpawnEntity, "/spawn_entity")
+    node.get_logger().info("Connecting to `/spawn_entity` service...")
+    if not client.service_is_ready():
+        client.wait_for_service()
+        node.get_logger().info("...connected!")
+
+    
+    # Get the yaml configuration
+    yaml_file_path = os.path.join(
+        get_package_share_directory(package_name), "config", yaml_file)
+    yaml_config = open(yaml_file_path, 'r').read()
+    configParams = yaml.safe_load(yaml_config)
+
     rclpy.spin(spawn_box)
 
 

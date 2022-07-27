@@ -20,7 +20,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-        'palletizing_algorithm       = palletizing_algorithm.palletizing_algorithm:main',
+        'palletizing_algorithm      = palletizing_algorithm.palletizing_algorithm:main',
+        'palletizing     = palletizing_algorithm.palletizing_algorithm:main',
+        'position_information = palletizing_algorithm.palletizing_algorithm:main',
         ],
     },
 )

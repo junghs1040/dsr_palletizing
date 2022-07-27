@@ -19,7 +19,7 @@ class SpawnBoxServer(Node):
     count = 0     
     def spawn_box(self, request, response):
         req = request.spawn
-        
+        num = 0
         width, length, height = self.boxes_data_read(self.count)
         response.width = width
         response.length = length
@@ -28,6 +28,10 @@ class SpawnBoxServer(Node):
         
         req = self.boxes_choice(self.count+1,width,length,height)        
         future = self.client.call_async(req)
+        if num == 0:
+            req = self.pallet_make() 
+            future = self.client.call_async(req)
+            num += 1
         self.count +=1
         return response
 
@@ -45,15 +49,38 @@ class SpawnBoxServer(Node):
         #ixx = mass*(length*length+height*height)/12
         #iyy = mass*(width*width+height*height)/12
         #izz = mass*(length*length+width*width)/12
-        ixx = 0.001
-        iyy = 0.001
-        izz = 0.001
+        #ixx = 0.001
+        #iyy = 0.001
+        #izz = 0.001
+        ixx = 100
+        iyy = 100
+        izz = 100
         request = SpawnEntity.Request()
         request.name = str(box_num)
         request.xml = "<?xml version=\"1.0\" ?><robot name=\"box1\"><link name=\"box1\"><visual><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><geometry><box size=\""+str(width)+" "+str(length)+" "+str(height)+"\"/></geometry></visual><inertial><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><mass value=\""+str(mass)+"\"/><inertia ixx=\""+str(ixx)+"\" ixy=\"0.0\" ixz=\"0.0\" iyy=\""+str(iyy)+"\" iyz=\"0.0\" izz=\""+str(izz)+"\"/></inertial><collision><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><geometry><box size=\""+str(width)+" "+str(length)+" "+str(height)+"\"/></geometry></collision></link><gazebo reference=\"box1\"><material>Gazebo/Red</material></gazebo></robot>"
         #request.robot_namespace = argv[1]
         request.initial_pose.position.x = float(0.4)
         request.initial_pose.position.y = float(0.5)
+        request.initial_pose.position.z = float(0.0)        
+        return request
+        
+    def pallet_make(self):
+        # Set data for request
+        mass = 0.005
+        #ixx = mass*(length*length+height*height)/12
+        #iyy = mass*(width*width+height*height)/12
+        #izz = mass*(length*length+width*width)/12
+        width = 0.5
+        length = 0.5
+        height = 0.05
+        ixx = 100
+        iyy = 100
+        izz = 100
+        request = SpawnEntity.Request()
+        request.name = "pallet"
+        request.xml = "<?xml version=\"1.0\" ?><robot name=\"box1\"><link name=\"box1\"><visual><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><geometry><box size=\""+str(width)+" "+str(length)+" "+str(height)+"\"/></geometry></visual><inertial><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><mass value=\""+str(mass)+"\"/><inertia ixx=\""+str(ixx)+"\" ixy=\"0.0\" ixz=\"0.0\" iyy=\""+str(iyy)+"\" iyz=\"0.0\" izz=\""+str(izz)+"\"/></inertial><collision><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><geometry><box size=\""+str(width)+" "+str(length)+" "+str(height)+"\"/></geometry></collision></link><gazebo reference=\"box1\"><material>Gazebo/Black</material></gazebo></robot>"
+        request.initial_pose.position.x = float(0.4)
+        request.initial_pose.position.y = float(-0.5)
         request.initial_pose.position.z = float(0.0)        
         return request
 

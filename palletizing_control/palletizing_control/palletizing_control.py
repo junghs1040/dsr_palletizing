@@ -39,6 +39,7 @@ class SpawnBoxOperator(Node):
         print("spawn the box!!!")
         return futures
         
+        
 class GripperOperator(Node):
     def __init__(self):
         super().__init__('vacuum_gripper_controller')
@@ -51,11 +52,8 @@ class GripperOperator(Node):
             SetBool, '/vacuum_gripper3/switch')           
         self.gripper_client4 = self.create_client(
             SetBool, '/vacuum_gripper4/switch')
-            
-        self.pallet_pos_server = self.create_service(
-            PalletPos, 'palletizing_pos', self.get_pallet_pos)      
-            
-                        
+           
+         
     def send_gripper_on(self):
         request = SetBool.Request()
         request.data = True
@@ -63,6 +61,7 @@ class GripperOperator(Node):
         futures = self.gripper_client2.call_async(request)
         futures = self.gripper_client3.call_async(request)
         futures = self.gripper_client4.call_async(request)
+
         return futures
         
     def send_gripper_off(self):
@@ -74,15 +73,25 @@ class GripperOperator(Node):
         futures = self.gripper_client4.call_async(request)   
         return futures     
         
+class GetPalletPos(Node):
+    def __init__(self):
+    	super().__init__('get_pallet_pos')
+    	self.count = 0
+    
+    	self.pallet_pos_server = self.create_service(
+            PalletPos, 'palletizing_pos', self.get_pallet_pos)   
+    
     def get_pallet_pos(self, request, response):
-        x_pos = request.x_pos
-        y_pos = request.y_pos
+        print("get the position info")
+        x_pos_ = request.x_pos
+        y_pos_ = request.y_pos
         z_pos = request.z_pos
+        print(x_pos_)
+        print(y_pos_)
         response.success = True
+        self.count +=1
         return response
-          
-       
-
+            
 
 def signal_handler(sig, frame):
     print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX signal_handler')
@@ -107,6 +116,7 @@ def main(args=None):
     future = spawnbox.send_request()
     
     gripper = GripperOperator()
+    pallet_pos = GetPalletPos()
 
     #----------------------------------------------------------------
     robot = CDsrRobot()
@@ -128,11 +138,13 @@ def main(args=None):
 
     pick_pos = posx(400, 500, 100.0, 0.0, 180.0, 0.0)
     pick_pos_up = posx(400, 500, 500.0, 0.0, 180.0, 0.0)
-    place_pos = posx(400, -500, 100.0, 0.0, 180.0, 0.0)
+    pick_pos_r = posx(400, 500, 500.0, 90.0, 180.0, 0.0)
+    place_pos = posx(400, -500, 150.0, 0.0, 180.0, 0.0)
     place_pos_up = posx(400, -500, 500.0, 0.0, 180.0, 0.0)
-
-
+    
+    
     while rclpy.ok(): 
+     
         # move joint    
         robot.movej(p2, vel=100, acc=100)
         print("------------> movej OK")    

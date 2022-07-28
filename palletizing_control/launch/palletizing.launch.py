@@ -30,14 +30,8 @@ def generate_launch_description():
                           name = 'palletizing_control',
                           output = 'screen',
                           )
-    algorithm_node = Node(package = 'palletizing_algorithm',
-                          executable = 'palletizing_algorithm',
-                          name = 'palletizing_algorithm',
-                          output = 'screen',
-                          )
                           
     ld.add_action(spawn_box_node)  
-    ld.add_action(algorithm_node)  
     ld.add_action(control_node) 
     
     return ld

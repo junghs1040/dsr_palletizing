@@ -20,7 +20,10 @@ class SpawnBoxServer(Node):
     def spawn_box(self, request, response):
         req = request.spawn
         num = 0
-        width, length, height = self.boxes_data_read(self.count)
+        width = float(request.box_info[0])/1000
+        length = float(request.box_info[1])/1000
+        height = float(request.box_info[2])/1000
+        #width, length, height = self.boxes_data_read(self.count)
         response.width = width
         response.length = length
         response.height = height

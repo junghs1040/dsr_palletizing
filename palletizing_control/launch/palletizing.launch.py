@@ -15,9 +15,11 @@ from launch.conditions import IfCondition
 
 import xacro
 
+args =[
+    DeclareLaunchArgument('box_set', default_value = '1', description = 'BOX_SET_NUM' ),
+]
+
 def generate_launch_description():
-    
-    ld = LaunchDescription()
     
     spawn_box_node = Node(package = 'boxes_spawner',
                           executable = 'spawn_boxes',
@@ -29,13 +31,15 @@ def generate_launch_description():
                           executable = 'palletizing_control',
                           name = 'palletizing_control',
                           output = 'screen',
+                          parameters = [ 
+                                        {"box_set" : LaunchConfiguration('box_set') }, 
+                                       ]
                           )
-                          
-    ld.add_action(spawn_box_node)  
-    ld.add_action(control_node) 
-    
-    return ld
-    
+
+    return LaunchDescription(args + [
+        spawn_box_node,
+        control_node,
+        ])
 
                           
                           

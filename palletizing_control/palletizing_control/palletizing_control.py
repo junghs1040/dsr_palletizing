@@ -30,6 +30,7 @@ from DSR_ROBOT2 import *
 class Palletizing(Node):
     def __init__(self):
         super().__init__('palletizing') 
+        
         self.pallet_width = 500
         self.pallet_length = 500
         self.pallet = np.zeros((self.pallet_width, self.pallet_length))
@@ -90,7 +91,12 @@ class Palletizing(Node):
         
 class Algorithm(Node):
     def __init__(self):
+
         super().__init__('palletizing_algorithm') 
+        
+        self.declare_parameter('box_set',1)
+        self.param_box = self.get_parameter('box_set')
+        self.get_logger().info("box_set :%s" %(str(self.param_box.value)))
         self.cum_x = 0
         self.cum_y = 0
         self.box_set1 = [[0.115, 0.1, 0.075],[0.16, 0.125, 0.075],[0.1, 0.075, 0.075],[0.195, 0.16, 0.075],[0.15, 0.1, 0.075],[0.15, 0.1, 0.075],[0.16, 0.125, 0.075],
@@ -112,7 +118,19 @@ class Algorithm(Node):
         self.box_set5 = [[0.100, 0.100, 0.075],[0.160, 0.125, 0.075],[0.075, 0.075, 0.075],[0.100, 0.075, 0.075],[0.160, 0.125, 0.075],[0.075, 0.075, 0.075],
                          [0.160, 0.125, 0.075],[0.150, 0.150, 0.150],[0.150, 0.150, 0.150],[0.075, 0.075, 0.075],[0.160, 0.125, 0.075],[0.160, 0.125, 0.075],
                          [0.100, 0.075, 0.075],[0.115, 0.100, 0.075],[0.160, 0.125, 0.075],[0.100, 0.100, 0.075],[0.100, 0.075, 0.075],[0.195, 0.160, 0.075],[0.100, 0.100, 0.075],[0.075, 0.075, 0.075]]
-
+                         
+    def box_choice(self):
+        if self.param_box.value == 1:
+            box_set = self.box_set1
+        elif self.param_box.value == 2:
+            box_set = self.box_set2
+        elif self.param_box.value == 3:
+            box_set = self.box_set3            
+        elif self.param_box.value == 4:
+            box_set = self.box_set4 
+        elif self.param_box.value == 5:
+            box_set = self.box_set5
+        return box_set                         
                          
     def get_box_sequently(self, box_set):
         box_set = np.array(box_set)
@@ -318,7 +336,8 @@ def main(args=None):
     #pallet_pos = GetPalletPos()
     
     algo = Algorithm()
-    x_pos, y_pos, z_pos, box_set = algo.put_box_sequently(ax, palletizing, algo.box_set3)
+    box_set = algo.box_choice()
+    x_pos, y_pos, z_pos, box_set = algo.put_box_sequently(ax, palletizing, box_set)
     
     n = 0
     spawnbox = SpawnBoxOperator()
@@ -346,7 +365,6 @@ def main(args=None):
     #place_pos = posx(400, -500, 150.0, 0.0, 180.0, 0.0)
     #place_pos_up = posx(400, -500, 500.0, 0.0, 180.0, 0.0)
     num = 0
-    z_pos[19] = 225
     while rclpy.ok(): 
         if box_set[n][2] == 150:
             num = 55

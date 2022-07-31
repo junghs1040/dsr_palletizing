@@ -1,0 +1,3 @@
+palletizing_control:
+  ros__parameters:
+    box_set : 1

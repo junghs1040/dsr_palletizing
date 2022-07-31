@@ -27,67 +27,6 @@ g_node = rclpy.create_node('palletizing_control')
 DR_init.__dsr__node = g_node
 from DSR_ROBOT2 import *
 #--------------------------------------------------------
-class Palletizing(Node):
-    def __init__(self):
-        super().__init__('palletizing') 
-        
-        self.pallet_width = 500
-        self.pallet_length = 500
-        self.pallet = np.zeros((self.pallet_width, self.pallet_length))
-    
-    def pallet_test(self, left_down_x,left_down_y, width, length):
-        scope_test = self.scope_test(left_down_x,left_down_y, width, length)
-        if scope_test !=0:
-            print("Failed in pallet size test")
-            return False
-
-        #exist_test = self.exist_test(left_down_x,left_down_y, width, length)
-        #if exist_test == False:
-         #   return False
-        return True
-    
-    # Test for Exceeding the Scope of the Pallet
-    def scope_test(self, left_down_x,left_down_y, width, length):
-        if left_down_x + width > self.pallet_width: 
-            return 1
-        if left_down_y + length > self.pallet_length: 
-            return 2
-        else :
-            return 0
-        
-    def exist_test(self, left_down_x,left_down_y, width, length):
-        for i in range(int(left_down_x), int(left_down_x)+width):
-            for j in range(int(left_down_y), int(left_down_y)+length):
-                if self.pallet[i][j] != 0:
-                    print("Failed in box exist test")
-                    return False
-        print("Successed in pallet test")
-        return True        
-   
-    def palletizing(self, ax, left_down_x, left_down_y, width, length):     
-        test = self.pallet_test(left_down_x,left_down_y, width, length)
-        if test == True:
-            self.pallet_input(left_down_x,left_down_y, width, length)
-            self.box_input(ax, left_down_x, left_down_y, width, length)
-        else :
-            print(False)
-        
-
-    
-    def pallet_input(self, left_down_x,left_down_y, width, length):
-        for i in range(int(left_down_x), int(left_down_x)+width):
-            for j in range(int(left_down_y), int(left_down_y)+length):
-                self.pallet[i][j] = 1     
-                
-    def box_input(self, ax, left_down_x, left_down_y, width, length):
-        ax.add_patch(
-           patches.Rectangle(
-           (left_down_x, left_down_y),      # (x, y) coordinates of left-bottom corner point
-           width, length,            # width, height
-           edgecolor = 'black',
-           fill = True,
-           facecolor = 'red',
-           ))
         
 class Algorithm(Node):
     def __init__(self):
@@ -138,12 +77,12 @@ class Algorithm(Node):
         box_set = box_set.tolist()
         return box_set
     
-    def put_box_sequently(self, ax, palletizing, box_set):
+    def put_box_sequently(self, box_set):
         box_set = self.box_sort(box_set)
         box_set = self.get_box_sequently(box_set)
-        y_pos = self.Algo1(box_set)
+        y_pos = self.calculate_y_pos(box_set)
         print(y_pos)
-        x_pos = self.Algo2(y_pos, box_set)
+        x_pos = self.calculate_x_pos(y_pos, box_set)
         x_pos = self.give_box_position(x_pos, y_pos)
         z_pos = self.calculate_z_pos(x_pos)
         x_pos, y_pos = self.give_pos(x_pos, y_pos, box_set)
@@ -163,7 +102,7 @@ class Algorithm(Node):
         
         return x_pos_list
     
-    def Algo1(self, box_set):
+    def calculate_y_pos(self, box_set):
         acum_y = 0
         count = 0
         y_pos=[]
@@ -179,7 +118,7 @@ class Algorithm(Node):
         return y_pos
 
     
-    def Algo2(self, y_pos, box_set):
+    def calculate_x_pos(self, y_pos, box_set):
         acum_x = 0
         num = 0
         count = 0
@@ -221,7 +160,7 @@ class Algorithm(Node):
                 count = 1
             if count == 1:
               if x_pos[i] == 0:
-                  num = 75
+                  num = 85
             z_pos.append(num)
 
         return z_pos
@@ -324,21 +263,13 @@ def signal_handler(sig, frame):
 
 def main(args=None):
     global g_node
-    fig, ax = plt.subplots(figsize=(7, 7))
-    ax.set_xlim(0.0, 500.0)
-    ax.set_ylim(0.0, 500.0)
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    signal.signal(signal.SIGINT, signal_handler)
     
     gripper = GripperOperator()
-    palletizing = Palletizing()
-    #pallet_pos = GetPalletPos()
     
     algo = Algorithm()
     box_set = algo.box_choice()
-    x_pos, y_pos, z_pos, box_set = algo.put_box_sequently(ax, palletizing, box_set)
-    
+    x_pos, y_pos, z_pos, box_set = algo.put_box_sequently(box_set)
+
     n = 0
     spawnbox = SpawnBoxOperator()
     future = spawnbox.send_request(box_set[n])
@@ -346,11 +277,8 @@ def main(args=None):
     robot = CDsrRobot()
     #----------------------------------------------------------------
 
-    set_velx(100,100)  # set global task speed: 30(mm/sec), 20(deg/sec)
-    set_accx(100,100)  # set global task accel: 60(mm/sec2), 40(deg/sec2)
-    
-    #set_velx(30,20)  # set global task speed: 30(mm/sec), 20(deg/sec)
-    #set_accx(60,40)  # set global task accel: 60(mm/sec2), 40(deg/sec2)
+    set_velx(100,100)  
+    set_accx(100,100) 
 
     velx=[100, 100]
     accx=[100, 100]
@@ -359,27 +287,27 @@ def main(args=None):
 
     x1= posx(400, 500, 800.0, 0.0, 180.0, 0.0) #task
     x2= posx(400, 500, 500.0, 0.0, 180.0, 0.0) #task
+    # 500
+    pick_pos_up = posx(600, 0.0, 500.0, 0.0, 180.0, 0.0)
 
-    pick_pos_up = posx(400, 500, 500.0, 0.0, 180.0, 0.0)
-    pick_pos_r = posx(400, 500, 500.0, 90.0, 180.0, 0.0)
-    #place_pos = posx(400, -500, 150.0, 0.0, 180.0, 0.0)
-    #place_pos_up = posx(400, -500, 500.0, 0.0, 180.0, 0.0)
     num = 0
     while rclpy.ok(): 
         if box_set[n][2] == 150:
             num = 55
         else :
             num = 0
-        pick_pos = posx(400, 500, num+100, 0.0, 180.0, 0.0)
-        place_pos = posx(x_pos[n]+150, y_pos[n]-750, num+z_pos[n]+150.0, 0.0, 180.0, 0.0)
+        pick_pos = posx(600, 0.0, num+100, 0.0, 180.0, 0.0)
+        place_pos = posx(x_pos[n]+150, y_pos[n]-750, num+z_pos[n]+140.0, 0.0, 180.0, 0.0)
         place_pos_up = posx(x_pos[n]+150, y_pos[n]-750, 500.0, 0.0, 180.0, 0.0)
+        
         # move joint    
         robot.movej(p2, vel=100, acc=100)
         print("------------> movej OK")    
         future2 = gripper.send_gripper_on(num)
+        
         # move joint task : picking position  
-        robot.movel(pick_pos_up, velx, accx)
-        print("------------> movel OK")    
+        #robot.movel(pick_pos_up, velx, accx)
+        #print("------------> movel OK")    
         
         # move line : move to pick    
         robot.movel(pick_pos, velx, accx)
@@ -413,7 +341,7 @@ def main(args=None):
         print("------------> movel OK")    
 
         if n == 20:
-            print("palletizing finished")
+            print("palletizing finished, Press (Ctrl + C) to close the window ")
             time.sleep(1000) 
 
     print('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX good-bye!')

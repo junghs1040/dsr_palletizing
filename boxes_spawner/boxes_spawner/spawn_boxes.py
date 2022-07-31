@@ -62,8 +62,8 @@ class SpawnBoxServer(Node):
         request.name = str(box_num)
         request.xml = "<?xml version=\"1.0\" ?><robot name=\"box1\"><link name=\"box1\"><visual><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><geometry><box size=\""+str(width)+" "+str(length)+" "+str(height)+"\"/></geometry></visual><inertial><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><mass value=\""+str(mass)+"\"/><inertia ixx=\""+str(ixx)+"\" ixy=\"0.0\" ixz=\"0.0\" iyy=\""+str(iyy)+"\" iyz=\"0.0\" izz=\""+str(izz)+"\"/></inertial><collision><origin xyz=\"0 0 0\" rpy=\"0 0 0\"/><geometry><box size=\""+str(width)+" "+str(length)+" "+str(height)+"\"/></geometry></collision></link><gazebo reference=\"box1\"><material>Gazebo/Red</material></gazebo></robot>"
         #request.robot_namespace = argv[1]
-        request.initial_pose.position.x = float(0.4)
-        request.initial_pose.position.y = float(0.5)
+        request.initial_pose.position.x = float(0.6)
+        request.initial_pose.position.y = float(0.0)
         request.initial_pose.position.z = float(0.0)        
         return request
         

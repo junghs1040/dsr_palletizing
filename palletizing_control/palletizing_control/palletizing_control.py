@@ -81,13 +81,10 @@ class Algorithm(Node):
         box_set = self.box_sort(box_set)
         box_set = self.get_box_sequently(box_set)
         y_pos = self.calculate_y_pos(box_set)
-        print(y_pos)
         x_pos = self.calculate_x_pos(y_pos, box_set)
         x_pos = self.give_box_position(x_pos, y_pos)
         z_pos = self.calculate_z_pos(x_pos)
         x_pos, y_pos = self.give_pos(x_pos, y_pos, box_set)
-        if y_pos[19] == 0:
-            z_pos[19] = 225
         return x_pos, y_pos, z_pos, box_set
         
     def give_box_position(self, x_pos, y_pos):
@@ -162,7 +159,8 @@ class Algorithm(Node):
               if x_pos[i] == 0:
                   num = 85
             z_pos.append(num)
-
+        if x_pos[19] == 0:
+            z_pos[19] = 225
         return z_pos
 
     def box_sort(self, box_set):
@@ -303,7 +301,6 @@ def main(args=None):
         # move joint    
         robot.movej(p2, vel=100, acc=100)
         print("------------> movej OK")    
-        future2 = gripper.send_gripper_on(num)
         
         # move joint task : picking position  
         #robot.movel(pick_pos_up, velx, accx)
@@ -311,7 +308,8 @@ def main(args=None):
         
         # move line : move to pick    
         robot.movel(pick_pos, velx, accx)
-        print("------------> movel OK")    
+        print("------------> movel OK")   
+        future2 = gripper.send_gripper_on(num) 
         
         # picking - if get the true of /grasp picking topic
         # move line : move up

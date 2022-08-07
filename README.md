@@ -3,14 +3,14 @@
 Team : Seo & Jung Robotics (서앤정 로보틱스)       
       
 ### How to Start Palletizing      
-1. Start Gazebo and spawn the robot (Doosan robotics m1013)
+#### 1. Start Gazebo and spawn the robot (Doosan robotics m1013)
 <pre>
 <code>
 $ ros2 launch dsr_launcher2 single_robot_gazebo.launch.py
 </code>
 </pre>
       
-2. start palletizing with choosen set of boxes      
+#### 2. start palletizing with choosen set of boxes      
 the following command is palletizing with box set 3      
 <pre>
 <code>
